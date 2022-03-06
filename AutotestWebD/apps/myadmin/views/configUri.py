@@ -1,3 +1,4 @@
+import imp
 from urllib import parse
 
 # Create your views here.
@@ -6,6 +7,7 @@ from apps.common.config import commonWebConfig
 from apps.common.func.WebFunc import *
 from apps.myadmin.service.ConfigService import ConfigService
 from apps.myadmin.service.ConfigUriService import ConfigUriService
+import time
 # from apps.myadmin.service.InterfaceModuleService import InterfaceModuleService
 
 logger = logging.getLogger("django")
@@ -57,11 +59,13 @@ def addConfigUri(request):
     try:
         if len(searchResult) == 0:
             result = TbConfigUri()
+            result.id  = int(time.time())
             result.uriKey = configUriData["uriKey"]
             result.alias = configUriData["alias"]
             result.uriDesc = configUriData["uriDesc"]
             result.level = configUriData["level"]
             result.protocol = configUriData["protocol"]
+            logger.info("addConfigUri result: %s" % result.id)
             result.save()
             if result:
                 logger.info("addConfigUri uri添加成功 %s" % result)

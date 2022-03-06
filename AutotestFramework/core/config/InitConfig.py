@@ -1,10 +1,13 @@
 import logging
-import os
+import os,platform
 from core.processor.Config import Config
 
 rootDir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))).replace("\\","/")
 print("rootDir: %s" % rootDir)
 confDict = Config().getConfDictByFile("%s/config.ini" % rootDir)
+if platform.system() != 'Linux':
+    print(f'platform.system is {platform.system()}, so use config-local.ini')
+    confDict = Config().getConfDictByFile("%s/config-local.ini" % rootDir)
 print("config.ini CONFDICT: %s" % confDict)
 releaseRootDir = confDict['DIR']['releaseRoot']  # release环境的rootDir
 print("releaseRootDir: %s" % releaseRootDir)
@@ -77,14 +80,18 @@ class RunTcpServerConf(object):
 print("TcpServerConf: ip[%s] port[%s] uiport[%s] maxRequestCount[%s] recvLength[%s]" % (TcpServerConf.ip,TcpServerConf.port,TcpServerConf.uiport,TcpServerConf.maxRequestCount,TcpServerConf.recvLength))
 
 class LogConfig(object):
-    dirfilePath = confDict[dirfileKey]['filepath']
+    dirfilePath = releaseRootDir + confDict[dirfileKey]['filepath']
     dirfileLog = confDict[dirfileKey]['log']
     dirfileUploads = confDict[dirfileKey]['uploads']
     dirfileReports = confDict[dirfileKey]['reports']
 
-    logRoot = dirfileLog if "/" in dirfileLog or "\\" in dirfileLog else "%s/%s" % (dirfilePath, dirfileLog)
-    uploadsRoot = dirfileUploads if "/" in dirfileUploads or "\\" in dirfileUploads else "%s/%s" % (dirfilePath, dirfileUploads)
-    reportsRoot = dirfileReports if "/" in dirfileReports or "\\" in dirfileReports else "%s/%s" % (dirfilePath, dirfileReports)
+    logRoot = "%s/%s" % (dirfilePath, dirfileLog)
+    uploadsRoot = "%s/%s" % (dirfilePath, dirfileUploads)
+    reportsRoot = "%s/%s" % (dirfilePath, dirfileReports)
+
+    # logRoot = dirfileLog if "/" in dirfileLog or "\\" in dirfileLog else "%s/%s" % (dirfilePath, dirfileLog)
+    # uploadsRoot = dirfileUploads if "/" in dirfileUploads or "\\" in dirfileUploads else "%s/%s" % (dirfilePath, dirfileUploads)
+    # reportsRoot = dirfileReports if "/" in dirfileReports or "\\" in dirfileReports else "%s/%s" % (dirfilePath, dirfileReports)
 
     if isReleaseEnv:
         LEVEL = logging.INFO #release环境a
@@ -100,10 +107,10 @@ class LogConfig(object):
         FILE_DUBBOLOG = "%s/DubboAutotestFramework%s.log" % (logRoot,confDict['DIR']['useTag'])  # 测试环境
 
 
-print("LogConfig: logRoot[%s] LEVEL[%s] FILE[%s] UIFILE[%s]\n"
+print("LogConfig:LogConfig.dirfilePath[%s] logRoot[%s] LEVEL[%s] FILE[%s] UIFILE[%s]\n"
       "reportsRoot: %s\n"
       "uploadsRoot: %s" %
-      (LogConfig.logRoot,LogConfig.LEVEL,LogConfig.FILE,LogConfig.FILE_UILOG,LogConfig.reportsRoot,LogConfig.uploadsRoot))
+      (LogConfig.dirfilePath,LogConfig.logRoot,LogConfig.LEVEL,LogConfig.FILE,LogConfig.FILE_UILOG,LogConfig.reportsRoot,LogConfig.uploadsRoot))
 
 class EnvConfig(object):
     # DONE

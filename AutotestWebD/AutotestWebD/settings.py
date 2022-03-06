@@ -23,7 +23,10 @@ print("BASE_DIR: %s" % BASE_DIR)
 rootDir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))).replace("\\","/")
 print("rootDir: %s" % rootDir)
 
-confDict = Config().getConfDictByFile("%s/config.ini" % rootDir) #初始化配置文件
+confDict = Config().getConfDictByFile("%s/config.ini" % rootDir)  # 初始化配置文件
+if platform.system() != 'Linux':
+    print(f'platform.system is {platform.system()}, so use config-local.ini')
+    confDict = Config().getConfDictByFile("%s/config-local.ini" % rootDir) #初始化配置文件
 print("config.ini CONFDICT: %s" % confDict)
 
 #############################
@@ -149,16 +152,19 @@ dbName = confDict[dbKey]['dbname']
 print("dbHost[%s] dbPort[%s] dbUsername[%s] dbPassword[%s] dbName[%s]" % (dbHost,dbPort,dbUsername,dbPassword,dbName))
 
 
-dirfilePath = confDict[dirfileKey]['filepath']
+dirfilePath = rootDir + confDict[dirfileKey]['filepath']
 dirfileLog = confDict[dirfileKey]['log']
 dirfileUploads = confDict[dirfileKey]['uploads']
 dirfileReports = confDict[dirfileKey]['reports']
 
-logRoot = dirfileLog if "/" in dirfileLog or "\\" in dirfileLog else "%s/%s" % (dirfilePath,dirfileLog)
+# logRoot = dirfileLog if "/" in dirfileLog or "\\" in dirfileLog else "%s/%s" % (dirfilePath,dirfileLog)
+logRoot = "%s/%s" % (dirfilePath,dirfileLog)
 print("logRoot:%s" % logRoot)
-uploadsRoot = dirfileUploads if "/" in dirfileUploads or "\\" in dirfileUploads else "%s/%s" % (dirfilePath,dirfileUploads)
+# uploadsRoot = dirfileUploads if "/" in dirfileUploads or "\\" in dirfileUploads else "%s/%s" % (dirfilePath,dirfileUploads)
+uploadsRoot = "%s/%s" % (dirfilePath,dirfileUploads)
 print("uploadsRoot:%s" % uploadsRoot)
-reportsRoot = dirfileReports if "/" in dirfileReports or "\\" in dirfileReports else "%s/%s" % (dirfilePath,dirfileReports)
+# reportsRoot = dirfileReports if "/" in dirfileReports or "\\" in dirfileReports else "%s/%s" % (dirfilePath,dirfileReports)
+reportsRoot = "%s/%s" % (dirfilePath,dirfileReports)
 print("reportsRoot:%s" % reportsRoot)
 
 print("CONF_KEYS:dbKey[%s] tcpKey[%s] webKey[%s] emailKey[%s]" % (dbKey,tcpKey,webKey,emailKey))
