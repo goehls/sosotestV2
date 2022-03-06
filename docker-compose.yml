@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+
+  mysql-server:
+    image: mysql:5.7.22
+    container_name: mysql5.7
+    command:
+      - --default_authentication_plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+    - 6607:3306
+    volumes:
+      # 可移除
+      - /Users/boyizhang/opt/data/mysql:/var/lib/mysql
+      - /Users/boyizhang/opt/data/conf/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: sosotest_data
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+
+  redis-server:
+    image: redis:4.0.2
+    container_name: myredis
+    restart: always
+    volumes:
+      # 可移除
+      - /Users/boyizhang/opt/data/redis:/data
+    ports:
+    - 6380:6379
+  sosotest-server:
+    build:
+      context: .
+      dockerfile: sosotest.dockerfile
+    container_name: sosotest_server
+    depends_on:
+      - mysql-server
+      - redis-server
+    ports:
+      - "1211:1211"
+    restart: always
